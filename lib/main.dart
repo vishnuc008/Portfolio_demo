@@ -1,4 +1,5 @@
 import 'package:akshayfreelance/form.dart';
+import 'package:akshayfreelance/kitchenui.dart';
 import 'package:akshayfreelance/profilepage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         
       ),
-      home:   FirstScreen()
+      home:  const FirstScreen()
     );
   }
 }

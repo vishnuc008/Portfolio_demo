@@ -121,6 +121,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.4"
+  file_picker:
+    dependency: "direct main"
+    description:
+      name: file_picker
+      sha256: b1729fc96627dd44012d0a901558177418818d6bd428df59dcfeb594e5f66432
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.2"
   file_selector_linux:
     dependency: transitive
     description:
@@ -251,6 +259,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_vector_icons:
+    dependency: "direct main"
+    description:
+      name: flutter_vector_icons
+      sha256: "20a77e282f8cb438c8edcee4eec85d8497d5f4cbeb07d116e9d2d01c9edfc5e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter

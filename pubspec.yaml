@@ -36,6 +36,8 @@ dependencies:
   uuid: ^3.0.7
   image_picker: ^0.8.9
   url_launcher: ^6.1.11
+  flutter_vector_icons: ^2.0.0
+  file_picker: ^5.3.2
 
 
   # The following adds the Cupertino Icons font to your application.

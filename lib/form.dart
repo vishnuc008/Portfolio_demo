@@ -1,19 +1,24 @@
-
 import 'dart:convert';
 import 'dart:developer';
+
 import 'dart:io';
 import 'dart:math';
 import 'package:akshayfreelance/profilepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
-  import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
 class FirstScreen extends StatefulWidget {
   const FirstScreen({super.key});
 
@@ -22,6 +27,7 @@ class FirstScreen extends StatefulWidget {
 }
 
 class _FirstScreenState extends State<FirstScreen> {
+  
   final formkey = GlobalKey<FormState>();
   final textfieldcontroller1 = TextEditingController();
   final textfieldcontroller2 = TextEditingController();
@@ -31,12 +37,12 @@ class _FirstScreenState extends State<FirstScreen> {
   final textfieldcontroller6 = TextEditingController();
   final textfieldcontroller7 = TextEditingController();
   final textfieldcontroller8 = TextEditingController();
-  final textfieldcontroller9  = TextEditingController();
+  final textfieldcontroller9 = TextEditingController();
   var image = Rxn<XFile>();
-   var imageUrl = Rxn<String>();
-  final imagepicker=ImagePicker();
-  String ?saveimage;
-
+  var imageUrl = Rxn<String>();
+  final imagepicker = ImagePicker();
+  String? saveimage;
+ 
 
   @override
   Future<void> saveDataToFirebase() async {
@@ -49,7 +55,7 @@ class _FirstScreenState extends State<FirstScreen> {
     final text5 = textfieldcontroller6.text;
     final text6 = textfieldcontroller7.text;
     final text7 = textfieldcontroller8.text;
-    final text8= textfieldcontroller9.text;
+    final text8 = textfieldcontroller9.text;
     FirebaseFirestore.instance.collection('your collection').add({
       "id": id,
       'email': text,
@@ -59,9 +65,9 @@ class _FirstScreenState extends State<FirstScreen> {
       'facebook': text4,
       'linkdin': text5,
       'whatsapp': text6,
-      'image':imageUrl.value,
+      'image': imageUrl.value,
       'insta': text7,
-      'description':text8
+      'description': text8
     }).then((value) {
       textfieldcontroller1.clear();
       textfieldcontroller2.clear();
@@ -83,33 +89,47 @@ class _FirstScreenState extends State<FirstScreen> {
       print('Error:$error');
     });
   }
+  
+
   Future<void> getImage() async {
     final imagepickedfile =
         await imagepicker.pickImage(source: ImageSource.gallery);
     if (imagepickedfile != null) {
-    image.value=imagepickedfile; 
-    uploadImageToFirebase();
+      image.value = imagepickedfile;
+      
+      uploadImageToFirebase();
+    }
   }
-  }
+
   firebase_storage.FirebaseStorage _storage = firebase_storage.FirebaseStorage.instance;
 
-Future<String> uploadImageToFirebase() async {
-  if (image.value == null) return '';
+  Future<String> uploadImageToFirebase() async {
+    if (image.value == null) return '';
 
-  String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-  firebase_storage.Reference ref = _storage.ref().child('images/$fileName');
-  firebase_storage.UploadTask uploadTask = ref.putFile(File(image.value!.path));
-  firebase_storage.TaskSnapshot taskSnapshot = await uploadTask;
-  
-  if (taskSnapshot.state == firebase_storage.TaskState.success) {
-    String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-    imageUrl.value=downloadUrl;
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    firebase_storage.Reference ref = _storage.ref().child('images/$fileName');
+    firebase_storage.UploadTask uploadTask =
+        ref.putFile(File(image.value!.path));
+    firebase_storage.TaskSnapshot taskSnapshot = await uploadTask;
+
+    if (taskSnapshot.state == firebase_storage.TaskState.success) {
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      imageUrl.value = downloadUrl;
+    }
+
+    return '';
   }
-  
-  return '';
-}
+
+
+
+
+
+
+
 
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return SafeArea(
         child: Scaffold(
       body: Form(
@@ -119,6 +139,58 @@ Future<String> uploadImageToFirebase() async {
             // mainAxisAlignment: MainAxisAlignment.center,
             // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 0),
+                  child: GestureDetector(
+                    onTap: () {
+                      getImage();
+                    },
+                    child: Container(
+                      height: height / 6,
+                      width: width / 1.5,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.black),
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                              Colors.black.withOpacity(0.5),
+                              blurStyle: BlurStyle.outer, // shadow color
+                               //spreadRadius: 1,// extent of the shadow
+                              blurRadius: 3,// blur effect
+                              offset:
+                                  Offset(0, 1), // changes position of shadow
+                            ),
+                          ]),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Image(
+                              image: AssetImage(
+                                  "assets/images/upload.jpg"),
+                              width: width / 9,
+                              height: height / 9,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "Drop your image here, or browse",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+            
               Padding(
                 padding: const EdgeInsets.only(top: 30),
                 child: CustomTextField(
@@ -164,6 +236,7 @@ Future<String> uploadImageToFirebase() async {
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: CustomTextField(
+                  lines: 2,
                   hintText: "Company Address",
                   label: const Text("Company Adress"),
                   controller: textfieldcontroller3,
@@ -174,13 +247,13 @@ Future<String> uploadImageToFirebase() async {
                     return null;
                   },
                 ),
-              ), 
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(onPressed: (){
-                  getImage();
-                }, child: Text("Add Image")),
               ),
+              // Padding(
+              //   padding: const EdgeInsets.all(10),
+              //   child: ElevatedButton(onPressed: (){
+              //     getImage();
+              //   }, child: Text("Add Image")),
+              // ),
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: CustomTextField(
@@ -238,52 +311,88 @@ Future<String> uploadImageToFirebase() async {
                   },
                 ),
               ),
-
-              // ListView.builder(
-              //   itemCount: socialMediaLinks.length,
-              //   shrinkWrap: true,
-              //   physics: const NeverScrollableScrollPhysics(),
-              //   itemBuilder: (context, index) {
-              //     TextEditingController controller = TextEditingController();
-              //     controller.text = socialMediaLinks[index];
-              //     return Padding(
-              //       padding: const EdgeInsets.only(top: 20),
-              //       child: CustomTextField(
-              //           controller: controller,
-              //           onchanged: (text) => socialMediaLinks[index] = text,
-              //           hintText: "Social Media Links",
-              //           label: Text("Social Media Links${index + 1}")),
-              //     );
-              //   },
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.all(10),
-              //   child: ElevatedButton(
-              //       onPressed: () {
-              //         setState(() {
-              //           socialMediaLinks.add('');
-              //         });
-              //       },
-              //       child: const Text("Add Social Media Links")),
-              // ),
               Padding(
-                padding: const EdgeInsets.only(top: 50),
+                padding: const EdgeInsets.only(left: 15,top: 10),
+                child: Text("Upload the Files",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+              ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 30, 10, 0),
+                  child: Row( 
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,           
+                  children: [
+                  Container(
+                    height: height/11,
+                    width: width/4,
+                    decoration: BoxDecoration(
+                     color: Colors.blue,
+                     borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Column(
+                      children: [
+                       Image(image: AssetImage("assets/images/cloud.jpg"),width: width/9,height: height/15,),
+                       Text("Drop Files here",style: TextStyle(fontSize: 7,color: Colors.white,fontWeight: FontWeight.bold),)
+                      ],
+                    ),
+                  ),
+                  //SizedBox(width: width/4,),
+                   Container(
+                    height: height/11,
+                    width: width/4,
+                    decoration: BoxDecoration(
+                     color: Colors.blue,
+                     borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Column(
+                      children: [
+                       Image(image: AssetImage("assets/images/cloud.jpg"),width: width/9,height: height/15,),
+                       Text("Drop Files here",style: TextStyle(fontSize: 7,color: Colors.white,fontWeight: FontWeight.bold),)
+                      ],
+                    ),
+                  ),
+                  //SizedBox(width: width/4,),
+                   Container(
+                    height: height/11,
+                    width: width/4,
+                    decoration: BoxDecoration(
+                     color: Colors.blue,
+                     borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Column(
+                      children: [
+                       Image(image: AssetImage("assets/images/cloud.jpg"),width: width/9,height: height/15,),
+                       Text("Drop Files here",style: TextStyle(fontSize: 7,color: Colors.white,fontWeight: FontWeight.bold),)
+                      ],
+                    ),
+                  ),
+                  ],
+                              ),
+                ),
+
+              
+              Padding(
+                padding: const EdgeInsets.only(top: 40, bottom: 15,),
                 child: Align(
                   alignment: Alignment.center,
-                  child: ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      onPressed: () {
-                        if (formkey.currentState!.validate()) {
-                          saveDataToFirebase();
-                        }
-                      },
-                      child: const Text(
-                        "Submit",
-                        style: TextStyle(color: Colors.white),
-                      )),
+                  child: Container(
+                    height: height*0.06,
+                    width: width/2,
+                    child: ElevatedButton(
+                        style:
+                            ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        onPressed: () {
+                          if (formkey.currentState!.validate()) {
+                            saveDataToFirebase();
+                          }
+                        },
+                        child: const Text(
+                          "Submit",
+                          style: TextStyle(color: Colors.white),
+                        )),
+                  ),
                 ),
-              )
+              ),
+              
             ],
           ),
         ),
